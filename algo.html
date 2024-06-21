@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregunta con Opciones</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f0f8ff;
+            overflow: hidden; /* Evita barras de desplazamiento */
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #ff4500;
+            text-shadow: 2px 2px #ffa07a;
+        }
+        .container {
+            display: inline-block;
+            text-align: center;
+            margin-top: 50px;
+            position: relative;
+            width: 100%;
+        }
+        .option {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #ffebcd;
+            border: 2px solid #ff4500;
+            border-radius: 10px;
+            cursor: pointer;
+            position: absolute;
+            transition: transform 0.2s; /* Transición suave del movimiento */
+        }
+        .option:hover {
+            background-color: #ffdead;
+        }
+        #noActionOption {
+            top: 50px; /* Inicialmente ubicado en la parte superior */
+            left: 50%; /* Centrado horizontalmente */
+            transform: translateX(-50%);
+        }
+        #message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 40px;
+            background-color: #ff4500;
+            color: white;
+            border-radius: 20px;
+            width: 80%; /* Ajuste del ancho del cuadro */
+            max-width: 500px; /* Ancho máximo del cuadro */
+            z-index: 1000;
+            text-shadow: 2px 2px #ffa07a;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            font-size: 1.5em;
+        }
+        #sound {
+            display: none;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <h1>¿Cuál es tu color favorito?</h1>
+    <div class="container">
+        <div class="option" id="noActionOption">Opción 1: Azul</div>
+        <div class="option" onclick="showMessage()">Opción 2: Verde</div>
+    </div>
+    <div id="message">¡Buena elección!</div>
+    <audio id="sound" src="ruta-de-tu-sonido.mp3"></audio>
+
+    <script>
+        var noActionOption = document.getElementById('noActionOption');
+        var threshold = 100; // Distancia en píxeles para activar el movimiento
+
+        function getDistance(x1, y1, x2, y2) {
+            return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        }
+
+        function moveOptionAway(event) {
+            var optionRect = noActionOption.getBoundingClientRect();
+            var optionX = optionRect.left + optionRect.width / 2;
+            var optionY = optionRect.top + optionRect.height / 2;
+            var distance = getDistance(optionX, optionY, event.clientX, event.clientY);
+
+            if (distance < threshold) {
+                var angle = Math.atan2(optionY - event.clientY, optionX - event.clientX);
+                var newX = optionX + Math.cos(angle) * threshold;
+                var newY = optionY + Math.sin(angle) * threshold;
+
+                newX = Math.max(optionRect.width / 2, Math.min(window.innerWidth - optionRect.width / 2, newX));
+                newY = Math.max(optionRect.height / 2, Math.min(window.innerHeight - optionRect.height / 2, newY));
+
+                noActionOption.style.transform = `translate(${newX - optionRect.width / 2}px, ${newY - optionRect.height / 2}px)`;
+            }
+        }
+
+        document.addEventListener('mousemove', moveOptionAway);
+
+        function showMessage() {
+            var message = document.getElementById('message');
+            var sound = document.getElementById('sound');
+            message.style.display = 'block';
+            sound.play();
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    </script>
+</body>
+</html>
